@@ -4,7 +4,7 @@ import Vapor
 public func routes(_ router: Router) throws {
     // Basic "It works" example
     router.get { req in
-        return "It works!"
+        return try req.view().render("index", IndexModel(ipAddress: req.http.remotePeer.hostname ?? "nil"))
     }
     
     // Basic "Hello, world!" example
@@ -12,9 +12,8 @@ public func routes(_ router: Router) throws {
         return "Hello, world!"
     }
 
-    // Example of configuring a controller
-    let todoController = TodoController()
-    router.get("todos", use: todoController.index)
-    router.post("todos", use: todoController.create)
-    router.delete("todos", Todo.parameter, use: todoController.delete)
+    router.get("api/data", String.parameter) { req -> ApiDataResponse in
+        let param = try req.parameters.next(String.self)
+        return ApiDataResponse(apiData: "This is data returned from the api. The parameter was \(param)")
+    }
 }
